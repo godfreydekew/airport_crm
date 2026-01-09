@@ -167,19 +167,6 @@ export default function Login() {
                     )}
                   </Button>
                 </form>
-
-                {/* Demo credentials */}
-                <div className="mt-6 pt-6 border-t border-border">
-                  <p className="text-xs text-muted-foreground text-center mb-3">
-                    Demo credentials
-                  </p>
-                  <div className="grid gap-2 text-xs">
-                    <div className="flex justify-between items-center p-2 rounded-md bg-muted/50">
-                      <span className="text-muted-foreground">Admin:</span>
-                      <code className="text-foreground">admin@parkcrm.com / admin123</code>
-                    </div>
-                  </div>
-                </div>
               </CardContent>
             </Card>
 
