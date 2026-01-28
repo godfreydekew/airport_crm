@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
 
-  const initials = user?.name
+  const initials = user?.fullName
     .split(' ')
     .map(n => n[0])
     .join('')
@@ -91,12 +91,12 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
                 {initials}
               </div>
-              <span className="hidden sm:inline text-sm font-medium">{user?.name || 'User'}</span>
+              <span className="hidden sm:inline text-sm font-medium">{user?.fullName || 'User'}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <div className="px-2 py-1.5">
-              <p className="text-sm font-medium">{user?.name}</p>
+              <p className="text-sm font-medium">{user?.fullName}</p>
               <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
             <DropdownMenuSeparator />

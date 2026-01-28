@@ -6,6 +6,7 @@ from ...models import User
 from ...shemas import UserCreate, UserResponse, UserInDB
 from ...config import settings
 
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class UserService:

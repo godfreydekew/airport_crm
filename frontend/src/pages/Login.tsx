@@ -10,11 +10,11 @@ import { Car, Sun, Moon, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [name, setname] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -22,19 +22,20 @@ export default function Login() {
     e.preventDefault();
     setError('');
     
-    if (!email || !password) {
-      setError('Please enter both email and password');
+    if (!name || !password) {
+      setError('Please enter both name and password');
       return;
     }
 
     setIsLoading(true);
-    const success = await login(email, password);
+    // console.log("Submitting login for:", name);
+    const success = await login(name, password);
     setIsLoading(false);
 
     if (success) {
       navigate('/');
     } else {
-      setError('Invalid email or password');
+      setError('Invalid name or password');
     }
   };
 
@@ -127,13 +128,13 @@ export default function Login() {
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="name">Name</Label>
                     <Input
-                      id="email"
-                      type="email"
-                      placeholder="admin@parkcrm.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      id="name"
+                      type="text"
+                      placeholder="John"
+                      value={name}
+                      onChange={(e) => setname(e.target.value)}
                       disabled={isLoading}
                       className="h-11"
                     />
@@ -171,7 +172,7 @@ export default function Login() {
             </Card>
 
             <p className="text-center text-xs text-muted-foreground mt-6">
-              © 2024 ParkCRM. All rights reserved.
+              © 2026 ParkCRM. All rights reserved.
             </p>
           </div>
         </div>

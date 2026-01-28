@@ -1,54 +1,66 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-interface User {
-  email: string;
-  name: string;
-  role: 'Admin';
-}
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { login as authLogin, getCurrentUser } from '@/lib/api/auth';
+import { LoginParams, User } from '@/types/crm';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  loading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const MOCK_USERS = [
-  { email: 'admin@parkcrm.com', password: 'admin123', name: 'Sarah Johnson', role: 'Admin' as const },
-];
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('crm_user');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const foundUser = MOCK_USERS.find(
-      u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
-    
-    if (foundUser) {
-      const userData = { email: foundUser.email, name: foundUser.name, role: foundUser.role };
+  // Load user on mount if token exists
+  useEffect(() => {
+    const loadUser = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const userData = await getCurrentUser(token);
+          setUser(userData);
+        } catch (error) {
+          console.error('Failed to load user:', error);
+          localStorage.removeItem('token');
+        }
+      }
+      setLoading(false);
+    };
+
+    loadUser();
+  }, []);
+
+  const login = async (name: string, password: string): Promise<boolean> => {
+    try {
+
+      console.log("Attempting login for:", password);
+      const loginResponse = await authLogin({ username: name, password });
+      
+      localStorage.setItem('token', loginResponse.access_token);
+      
+      const userData = await getCurrentUser(loginResponse.access_token);
+      
       setUser(userData);
-      localStorage.setItem('crm_user', JSON.stringify(userData));
+      
       return true;
+    } catch (error) {
+      console.error('Login failed:', error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('crm_user');
+    localStorage.removeItem('token');
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

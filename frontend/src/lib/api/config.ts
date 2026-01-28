@@ -10,3 +10,18 @@ export const apiConfig = {
   },
 };
 
+export const authConfig = {
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  }
+}
+
+export function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem('token');
+  
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` }),
+  };
+}

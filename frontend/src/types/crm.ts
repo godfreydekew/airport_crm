@@ -75,3 +75,21 @@ export interface PaymentBreakdown {
   count: number;
   amount: number;
 }
+export interface LoginResponse {
+  access_token: string;
+  token_type: string;
+}
+
+export interface LoginParams {
+  username: string;
+  password: string;
+}
+
+export interface User {
+  id: string;
+  fullName: string;
+  email: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}

@@ -1,13 +1,13 @@
 /**
  * API client utility functions
  */
-import { apiConfig } from './config';
+import { apiConfig, getAuthHeaders } from './config';
 
 export interface ApiError {
   detail: string;
 }
 
-async function handleResponse<T>(response: Response): Promise<T> {
+export async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const error: ApiError = await response.json().catch(() => ({
       detail: `HTTP error! status: ${response.status}`,
@@ -20,7 +20,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 export async function apiGet<T>(endpoint: string): Promise<T> {
   const response = await fetch(`${apiConfig.baseURL}${endpoint}`, {
     method: 'GET',
-    headers: apiConfig.headers,
+    headers: getAuthHeaders(),
   });
   return handleResponse<T>(response);
 }
@@ -28,7 +28,7 @@ export async function apiGet<T>(endpoint: string): Promise<T> {
 export async function apiPost<T>(endpoint: string, data?: unknown): Promise<T> {
   const response = await fetch(`${apiConfig.baseURL}${endpoint}`, {
     method: 'POST',
-    headers: apiConfig.headers,
+    headers: getAuthHeaders(),
     body: data ? JSON.stringify(data) : undefined,
   });
   return handleResponse<T>(response);
@@ -37,7 +37,7 @@ export async function apiPost<T>(endpoint: string, data?: unknown): Promise<T> {
 export async function apiPatch<T>(endpoint: string, data?: unknown): Promise<T> {
   const response = await fetch(`${apiConfig.baseURL}${endpoint}`, {
     method: 'PATCH',
-    headers: apiConfig.headers,
+    headers: getAuthHeaders(),
     body: data ? JSON.stringify(data) : undefined,
   });
   return handleResponse<T>(response);
@@ -46,7 +46,7 @@ export async function apiPatch<T>(endpoint: string, data?: unknown): Promise<T> 
 export async function apiDelete<T>(endpoint: string): Promise<T> {
   const response = await fetch(`${apiConfig.baseURL}${endpoint}`, {
     method: 'DELETE',
-    headers: apiConfig.headers,
+    headers: getAuthHeaders(),
   });
   return handleResponse<T>(response);
 }
