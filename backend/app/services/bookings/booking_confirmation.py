@@ -201,14 +201,14 @@ def send_booking_confirmation_email(
             "headers": {"X-Mailer": "Airport CRM"},
         },
     )
-    return response.json()
+    return response
 
 # if __name__ == "__main__":
-#   send_booking_confirmation_email(
+#   response = send_booking_confirmation_email(
 #       "dekewgodfrey@gmail.com",
 #       "Jane Smith",
 #       departure_date="2025-02-15",
-#       drop_off_time="06:00",
+#     #   drop_off_time="06:00",
 #       arrival_date="2025-02-20",
 #       pickup_time="14:00",
 #       flight_type="International",
@@ -219,3 +219,4 @@ def send_booking_confirmation_email(
 #       cost="450.00",
 #       special_instructions="Please park in shade.",
 #   )
+#   print(response)
