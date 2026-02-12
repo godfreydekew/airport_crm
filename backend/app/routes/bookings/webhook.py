@@ -4,15 +4,12 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.config import settings
 from app.services.csv_importer import CSVImporter  
+from app.services.bookings.booking_confirmation import send_booking_confirmation_email
 
 router = APIRouter(prefix="/api/webhooks", tags=["Webhooks"])
 
-
 def to_importer_row(payload: dict) -> dict:
-    """
-    Convert Google Sheets webhook payload into the exact dict shape
-    your CSVImporter expects (the spreadsheet column headers).
-    """
+
     return {
         "Timestamp": payload.get("timestamp", ""),  
         "Full Names": payload.get("fullNames", ""),
@@ -49,7 +46,6 @@ def receive_google_sheets_booking(
     if not row_number:
         raise HTTPException(status_code=400, detail="rowNumber is required")
 
-    # 3) Import using your existing logic
     importer = CSVImporter(db)
     row_dict = to_importer_row(payload)
 
@@ -65,6 +61,26 @@ def receive_google_sheets_booking(
             return {"status": "ok", "message": "duplicate_ignored", "rowNumber": row_number}
 
         raise HTTPException(status_code=400, detail=error or "Import failed")
-
+        
+    # Brevo function here to send confirmation email to the customer
+    try:
+        send_booking_confirmation_email(
+            email=row_dict["Email"], 
+            name=row_dict["Full Names"],
+            departure_date=row_dict["Departure Date"],
+            drop_off_time=row_dict["Vehicle Drop off Time"],
+            arrival_date=row_dict["Arrival Date"],
+            pickup_time=row_dict["Vehicle Pick -up Time"],
+            flight_type=row_dict["Type of Flight"],
+            vehicle_reg=row_dict["Vehicle Registration"],
+            vehicle_make_model=row_dict["Vehicle Make and Model"],
+            vehicle_color=row_dict["Vehicle Color"],
+            payment_method=row_dict["Payment Method"],
+            cost=row_dict["cost"],
+            special_instructions=row_dict["Special Instructions"],
+        )
+    except Exception as e:
+        print(f"Error sending confirmation email: {str(e)}")
+    # Save the booking to the database
     db.commit()
     return {"status": "ok", "message": "imported", "rowNumber": row_number}

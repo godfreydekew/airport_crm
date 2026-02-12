@@ -9,7 +9,6 @@ from ...models import Booking, BookingStatus, AuditLog, AuditEventType
 
 
 class BookingOperationsService:
-    """Service for booking operations like check-in, collect, status updates."""
 
     @staticmethod
     def check_in(db: Session, booking_id: int, user_id: Optional[int] = None) -> Optional[Booking]:
@@ -74,6 +73,7 @@ class BookingOperationsService:
         
         # Create audit log
         audit_log = AuditLog(
+            
             booking_id=booking_id,
             actor_user_id=user_id,
             event_type=AuditEventType.check_out,
