@@ -6,6 +6,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from ...models import Booking, BookingStatus, AuditLog, AuditEventType
+from ...shemas import BookingUpdate
 
 
 class BookingOperationsService:
@@ -160,3 +161,27 @@ class BookingOperationsService:
         db.refresh(booking)
         return booking
 
+    @staticmethod
+    def update_booking(db: Session, booking_id: int, new_booking: BookingUpdate) -> Optional[Booking]:
+        """
+        Update a booking.
+        
+        Args:
+            db: Database session
+            booking_id: ID of the booking
+            new_booking: New booking data
+        
+        Returns:
+            Updated booking or None if not found
+        """
+        print(new_booking)
+        booking = db.query(Booking).filter(Booking.id == booking_id).first()
+        
+        if not booking:
+            return None
+        
+        for key, value in new_booking.model_dump(exclude_unset=True).items():
+            setattr(booking, key, value)
+        db.commit()
+        db.refresh(booking)
+        return booking

@@ -1,19 +1,14 @@
-"""
-Booking API routes.
-"""
 from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.db import get_db
-from ...db import get_db
-from ...shemas import BookingOut, BookingStatus, FlightType, PaymentMethod
+from ...shemas import BookingUpdate, BookingStatus, FlightType, PaymentMethod
 from ...models import Booking as BookingModel, BookingStatus as BookingStatusEnum, FlightType as FlightTypeEnum, PaymentMethod as PaymentMethodEnum
 from ...services.bookings.booking_service import BookingService
 from ...services.bookings.booking_operations import BookingOperationsService
 from ...services.auth.dependencies import get_current_user
-
 
 class NoteRequest(BaseModel):
     """Request model for adding a note."""
@@ -211,3 +206,23 @@ def add_booking_note(
         raise HTTPException(status_code=404, detail="Booking not found")
     return booking_to_out(booking)
 
+
+@router.post("/{booking_id}/update", response_model=dict)
+def update_booking(
+    booking_id: int,
+    booking: BookingUpdate,
+    db: Session = Depends(get_db),
+) -> Optional[dict]:
+    """Update a booking."""
+    try:
+        updated_booking = BookingOperationsService.update_booking(db, booking_id, booking) 
+        if not updated_booking:
+            raise HTTPException(status_code=404, detail="Booking not found")
+        return {"message": "Booking updated successfully"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+   
+
+    
